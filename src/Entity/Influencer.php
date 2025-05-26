@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\InfluencerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InfluencerRepository::class)]
@@ -21,6 +23,14 @@ class Influencer
 
     #[ORM\Column(nullable: true)]
     private ?int $followers_count = null;
+
+    #[ORM\ManyToMany(mappedBy: 'influencers', targetEntity: Campaign::class)]
+    private Collection $campaigns;
+
+    public function __construct()
+    {
+        $this->campaigns = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,5 +71,10 @@ class Influencer
         $this->followers_count = $followers_count;
 
         return $this;
+    }
+
+    public function getCampaigns(): Collection
+    {
+        return $this->campaigns;
     }
 }

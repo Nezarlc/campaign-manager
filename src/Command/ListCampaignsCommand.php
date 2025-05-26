@@ -34,7 +34,7 @@ class ListCampaignsCommand extends Command
         }
 
         $table = new Table($output);
-        $table->setHeaders(['ID', 'Nombre', 'Descripción', 'Inicio', 'Fin']);
+        $table->setHeaders(['ID', 'Nombre', 'Descripción', 'Inicio', 'Fin', 'Influencers']);
 
         foreach ($campaigns as $campaign) {
             $dto = CampaignMapper::toDto($campaign);
@@ -44,8 +44,10 @@ class ListCampaignsCommand extends Command
                 $dto->description,
                 $dto->startDate,
                 $dto->endDate,
+                implode(', ', $dto->influencers),
             ]);
         }
+
 
         $table->render();
 

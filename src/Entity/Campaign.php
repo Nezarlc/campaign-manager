@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CampaignRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,6 +27,14 @@ class Campaign
 
     #[ORM\Column]
     private ?\DateTimeImmutable $end_date = null;
+
+    #[ORM\ManyToMany(targetEntity: Influencer::class, inversedBy: 'campaigns')]
+    private Collection $influencers;
+
+    public function __construct()
+    {
+        $this->influencers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +85,27 @@ class Campaign
     public function setEndDate(\DateTimeImmutable $end_date): static
     {
         $this->end_date = $end_date;
+
+        return $this;
+    }
+
+    public function getInfluencers(): Collection
+    {
+        return $this->influencers;
+    }
+
+    public function addInfluencer(Influencer $influencer): static
+    {
+        if (!$this->influencers->contains($influencer)) {
+            $this->influencers->add($influencer);
+        }
+
+        return $this;
+    }
+
+    public function removeInfluencer(Influencer $influencer): static
+    {
+        $this->influencers->removeElement($influencer);
 
         return $this;
     }

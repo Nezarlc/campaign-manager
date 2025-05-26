@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\Dto\CampaignInputDto;
 use App\Dto\CampaignOutputDto;
 use App\Entity\Campaign;
+use App\Entity\Influencer;
 
 final class CampaignMapper
 {
@@ -16,6 +17,13 @@ final class CampaignMapper
         $dto->description = $campaign->getDescription();
         $dto->startDate = $campaign->getStartDate()->format('Y-m-d');
         $dto->endDate = $campaign->getEndDate()->format('Y-m-d');
+        $dto->influencers = [];
+
+        foreach ($campaign->getInfluencers() as $influencer) {
+            if ($influencer instanceof Influencer) {
+                $dto->influencers[] = $influencer->getName();
+            }
+        }
 
         return $dto;
     }
