@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Mapper\CampaignMapper;
 use App\Repository\CampaignRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -35,13 +36,14 @@ class ListCampaignsCommand extends Command
         $table = new Table($output);
         $table->setHeaders(['ID', 'Nombre', 'Descripción', 'Inicio', 'Fin']);
 
-        foreach ($campaigns as $c) {
+        foreach ($campaigns as $campaign) {
+            $dto = CampaignMapper::toDto($campaign);
             $table->addRow([
-                $c->getId(),
-                $c->getName(),
-                $c->getDescription(),
-                $c->getStartDate()->format('Y-m-d'),
-                $c->getEndDate()->format('Y-m-d'),
+                $dto->id,
+                $dto->name,
+                $dto->description,
+                $dto->startDate,
+                $dto->endDate,
             ]);
         }
 

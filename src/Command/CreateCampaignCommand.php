@@ -2,7 +2,8 @@
 
 namespace App\Command;
 
-use App\Entity\Campaign;
+use App\Dto\CampaignInputDto;
+use App\Mapper\CampaignMapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,31 +27,20 @@ class CreateCampaignCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $dto = new CampaignInputDto();
         $helper = $this->getHelper('question');
 
-        $name = $helper->ask($input, $output, new Question('Nombre: '));
-        $description = $helper->ask($input, $output, new Question('Descripción: '));
-        $start = $helper->ask($input, $output, new Question('Fecha de inicio (YYYY-MM-DD): '));
-        $end = $helper->ask($input, $output, new Question('Fecha de fin (YYYY-MM-DD): '));
+        $dto->name = $helper->ask($input, $output, new Question('Nombre: '));
+        $dto->description = $helper->ask($input, $output, new Question('Descripción: '));
+        $dto->start = $helper->ask($input, $output, new Question('Fecha de inicio (YYYY-MM-DD): '));
+        $dto->end = $helper->ask($input, $output, new Question('Fecha de fin (YYYY-MM-DD): '));
 
-        try {
-            $startDate = new \DateTimeImmutable($start);
-            $endDate = new \DateTimeImmutable($end);
-        } catch (\Exception $e) {
-            $output->writeln('<error>Formato de fecha inválido</error>');
+        $campaign = CampaignMapper::fromDto($dto);
+
+        if (!$campaign) {
+            $output->writeln('<error>Fechas inválidas o incoherentes</error>');
             return Command::FAILURE;
         }
-
-        if ($startDate >= $endDate) {
-            $output->writeln('<error>La fecha de inicio debe ser anterior a la de fin</error>');
-            return Command::FAILURE;
-        }
-
-        $campaign = new Campaign();
-        $campaign->setName($name);
-        $campaign->setDescription($description);
-        $campaign->setStartDate($startDate);
-        $campaign->setEndDate($endDate);
 
         $this->em->persist($campaign);
         $this->em->flush();
